@@ -61,15 +61,15 @@
         </div>
 
         <div class="control">
-          <div class="controlRow"><label>方形画布</label><div class="value"><span id="boardVal">52</span> × <span id="boardVal2">52</span></div></div>
-          <input class="range" id="board" type="range" min="32" max="88" step="2" value="52" />
-          <div class="hint" id="boardHint">画布固定为正方形，图案会自动居中。</div>
+          <div class="controlRow"><label>画板规格</label><div class="value"><span id="boardVal">52</span> × <span id="boardVal2">52</span> 钉位</div></div>
+          <input class="range" id="board" type="range" min="52" max="104" step="26" value="52" />
+          <div class="hint" id="boardHint">52×52 表示 52列 × 52行可放豆钉位；豆子位于横竖线交点。</div>
         </div>
 
         <div class="control">
           <div class="controlRow"><label>图案最大边</label><div class="value"><span id="motifVal">36</span> 颗</div></div>
           <input class="range" id="motif" type="range" min="18" max="44" step="2" value="36" />
-          <div class="hint" id="motifHint">约 9.4cm；四周会自动保留安全空位，不会顶格。</div>
+          <div class="hint" id="motifHint">约 9.4cm；四周会自动保留安全钉位，不会顶格。</div>
         </div>
 
         <div class="control">
@@ -106,7 +106,7 @@
         <div class="resultHead" id="resultHead"><div><h2>拼豆图纸</h2><div class="sub" id="resultSub"></div></div><div class="actions"><button class="secondary" id="exportBtn">导出 PNG</button><button class="secondary" onclick="window.print()">打印 / PDF</button></div></div>
         <div class="stats" id="stats"><div class="stat"><b id="statBeads">—</b><span>总豆数</span></div><div class="stat"><b id="statColors">—</b><span>使用色数</span></div><div class="stat"><b id="statSize">—</b><span>预计成品</span></div><div class="stat"><b id="statTime">—</b><span>预计时间</span></div></div>
         <div class="canvasWrap" id="canvasWrap"><div class="canvasPad"><canvas id="pattern"></canvas></div></div>
-        <div class="detailControls" id="detailControls"><div class="zoom"><button class="miniBtn" id="fitBtn">适应屏幕</button><span class="value">细节</span><input id="cellSize" class="range" type="range" min="3" max="38" value="10" step="1"></div><div class="value" id="zoomVal">12 px/格</div></div>
+        <div class="detailControls" id="detailControls"><div class="zoom"><button class="miniBtn" id="fitBtn">适应屏幕</button><span class="value">细节</span><input id="cellSize" class="range" type="range" min="3" max="38" value="10" step="1"></div><div class="value" id="zoomVal">12 px/钉距</div></div>
         <div class="lower" id="lower"><div class="infoCard"><h3>预计拼豆时间</h3><div class="timeBig" id="timeBig">—</div><div class="timeBreakdown" id="timeBreakdown"></div></div><div class="infoCard"><h3>色号用量</h3><div class="paletteList" id="paletteList"></div></div></div>
       </section>
     </section>
@@ -138,14 +138,16 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   let bgMode = 'auto';
   const beadMM = 2.6;
   const BLANK = 65535;
+  const BOARD_SIZES = [52,78,104];
+  const normalizeBoard = v => BOARD_SIZES.reduce((best,n)=>Math.abs(n-v)<Math.abs(best-v)?n:best,BOARD_SIZES[0]);
   const USE_PRESETS = {
-    bag:{board:52,motif:36,label:'书包挂件',note:'推荐图案最大边约 9.4cm。四周预留约 8 格，方便压制、修边，也给挂环位置留余量。'},
-    key:{board:36,motif:24,label:'钥匙扣 / 手机挂件',note:'推荐图案最大边约 6.2cm。更轻、更适合随身挂，顶部建议保留挂环空间。'},
-    magnet:{board:52,motif:38,label:'冰箱贴',note:'推荐图案最大边约 9.9cm。主体适中，背面留足面积贴磁片。'},
-    coaster:{board:44,motif:38,label:'杯垫',note:'推荐图案最大边约 9.9cm。画面可更接近方形，但仍保留至少 3 格安全边。'},
-    desk:{board:52,motif:44,label:'桌面摆件',note:'推荐图案最大边约 11.4cm。细节更充分，适合配底座或支架。'},
-    wall:{board:80,motif:68,label:'相框 / 墙面装饰',note:'推荐图案最大边约 17.7cm。适合较高细节，成品更适合装框展示。'},
-    custom:{board:52,motif:36,label:'自定义',note:'自己调整方形画布与图案最大边；系统仍会保持图案居中并留出安全边。'}
+    bag:{board:52,motif:36,label:'书包挂件',note:'推荐图案最大边约 9.4cm。52×52 画板上四周约预留 8 个钉位，方便压制、修边，也给挂环位置留余量。'},
+    key:{board:52,motif:24,label:'钥匙扣 / 手机挂件',note:'推荐图案最大边约 6.2cm。使用 52×52 画板居中制作，成品更轻，顶部建议预留挂环位置。'},
+    magnet:{board:52,motif:38,label:'冰箱贴',note:'推荐图案最大边约 9.9cm。使用 52×52 画板，主体居中，背面保留足够面积贴磁片。'},
+    coaster:{board:52,motif:40,label:'杯垫',note:'推荐图案最大边约 10.4cm。使用 52×52 画板，适合方形或圆形满底作品，并预留压制边距。'},
+    desk:{board:52,motif:44,label:'桌面摆件',note:'推荐图案最大边约 11.4cm。使用 52×52 画板，细节更充分，适合配底座或支架。'},
+    wall:{board:78,motif:68,label:'相框 / 墙面装饰',note:'推荐使用 78×78 画板，图案最大边约 17.7cm；需要更大作品时可手动切换 104×104。'},
+    custom:{board:52,motif:36,label:'自定义',note:'画板可选 52×52、78×78、104×104；系统保持图案居中，并让每颗豆落在横竖线交点。'}
   };
 
   const rgbFromHex = hex => [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
@@ -184,7 +186,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   }
 
   function updateControls(evt,persist=true){
-    let b=+els.board.value;
+    let b=normalizeBoard(+els.board.value); els.board.value=b;
     const maxMotif=Math.max(18,b-8);
     els.motif.max=maxMotif;
     if(+els.motif.value>maxMotif) els.motif.value=maxMotif;
@@ -192,9 +194,9 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     els.boardVal.textContent=b; els.boardVal2.textContent=b; els.motifVal.textContent=m;
     els.colorVal.textContent=c===221?'221':c; els.speedVal.textContent=s; els.bgTolVal.textContent=bt;
     const minMargin=Math.max(0,Math.floor((b-m)/2));
-    els.boardHint.textContent=`2.6mm · 工作区约 ${fmtCM(b*beadMM)} × ${fmtCM(b*beadMM)}，始终保持正方形`;
-    els.motifHint.textContent=`最大边约 ${fmtCM(m*beadMM)}；至少预留约 ${minMargin} 格安全空位，图案自动居中`;
-    els.zoomVal.textContent=`${els.cellSize.value} px/格`;
+    els.boardHint.textContent=`${b}×${b} 钉位 · 2.6mm mini · 约 ${fmtCM(b*beadMM)} × ${fmtCM(b*beadMM)}；豆子中心位于横竖线交点`;
+    els.motifHint.textContent=`最大边约 ${fmtCM(m*beadMM)}；至少预留约 ${minMargin} 个钉位，图案自动居中`;
+    els.zoomVal.textContent=`${els.cellSize.value} px/钉距`;
     if(persist) localStorage.setItem('douge-settings',JSON.stringify({board:b,motif:m,c,s,bt,cell:+els.cellSize.value,mode,bgMode,use:els.useCase.value}));
     if(pattern){ updateTime(); if(evt && evt.target===els.cellSize) renderPattern(); }
   }
@@ -202,7 +204,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     const s=JSON.parse(localStorage.getItem('douge-settings')||'{}');
     const use=s.use||'bag';
     els.useCase.value=use;
-    if(s.board) els.board.value=s.board; else if(USE_PRESETS[use]) els.board.value=USE_PRESETS[use].board;
+    if(s.board) els.board.value=normalizeBoard(+s.board); else if(USE_PRESETS[use]) els.board.value=USE_PRESETS[use].board;
     if(s.motif) els.motif.value=s.motif; else if(USE_PRESETS[use]) els.motif.value=USE_PRESETS[use].motif;
     if(s.c) els.colors.value=s.c;if(s.s) els.speed.value=s.s;if(s.bt) els.bgTol.value=s.bt;if(s.cell) els.cellSize.value=s.cell;if(s.mode) mode=s.mode;if(s.bgMode) bgMode=s.bgMode;
     els.useNote.textContent=(USE_PRESETS[use]||USE_PRESETS.custom).note;
@@ -253,7 +255,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   });
 
   function generatePattern(img,boardSide,motifMax,maxColors,backgroundMode='auto',bgTol=18){
-    boardSide=Math.max(24,Math.round(boardSide));
+    boardSide=normalizeBoard(Math.round(boardSide));
     motifMax=Math.min(Math.max(8,Math.round(motifMax)),boardSide-4);
     const ratio=img.naturalWidth/img.naturalHeight;
     let targetW,targetH;
@@ -329,7 +331,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     const margins={l:pattern.bbox.x,r:pattern.w-pattern.bbox.x-pattern.bbox.w,t:pattern.bbox.y,b:pattern.h-pattern.bbox.y-pattern.bbox.h};
     const minMargin=Math.min(margins.l,margins.r,margins.t,margins.b);
     const useLabel=(USE_PRESETS[pattern.useCase]||USE_PRESETS.custom).label;
-    els.resultSub.textContent=`${useLabel} · 方形画布 ${pattern.w} × ${pattern.h} · 图案 ${pattern.bbox.w} × ${pattern.bbox.h} · 最小边距 ${minMargin} 格`;
+    els.resultSub.textContent=`${useLabel} · 画板 ${pattern.w} × ${pattern.h} 钉位 · 图案 ${pattern.bbox.w} × ${pattern.bbox.h} · 最小边距 ${minMargin} 个钉位`;
     els.statBeads.textContent=fmtNum(pattern.total);els.statColors.textContent=pattern.used.length;els.statSize.textContent=`${cmW.toFixed(1)} × ${cmH.toFixed(1)}cm`;
     requestAnimationFrame(()=>{ fitPattern(); renderPalette(); updateTime(); });
   }
@@ -337,42 +339,51 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   function textColor(rgb){ return (rgb[0]*.299+rgb[1]*.587+rgb[2]*.114)>154?'#171717':'#ffffff'; }
   function renderInto(canvas,cell,renderMode,forExport=false){
     const dpr=forExport?1:Math.min(window.devicePixelRatio||1,2);
+    // boardSide = number of peg/bead positions. Adjacent positions are one pitch apart.
+    // Lines pass THROUGH peg centers, so 52×52 means 52 vertical + 52 horizontal position lines.
+    const outer=Math.max(3,cell*.52);
     const pad=forExport?28:0, header=forExport?88:0;
-    const W=pattern.w*cell+pad*2,H=pattern.h*cell+pad*2+header;
+    const gridW=Math.max(0,(pattern.w-1)*cell), gridH=Math.max(0,(pattern.h-1)*cell);
+    const boardW=gridW+outer*2, boardH=gridH+outer*2;
+    const W=boardW+pad*2,H=boardH+pad*2+header;
     canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';
     const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
-    if(forExport){ c.fillStyle='#171717';c.font='700 26px -apple-system, PingFang SC, sans-serif';c.fillText('豆格 · 拼豆图纸',pad,38);c.fillStyle='#77736c';c.font='14px -apple-system, PingFang SC, sans-serif';c.fillText(`实际摆豆 ${fmtNum(pattern.total)}颗  ·  ${pattern.used.length}色  ·  MARD 221 / 2.6mm`,pad,64); }
-    c.save();c.translate(pad,pad+header);
-    const fontSize=Math.max(7,Math.min(12,cell*.38));
+    if(forExport){ c.fillStyle='#171717';c.font='700 26px -apple-system, PingFang SC, sans-serif';c.fillText('豆格 · 拼豆图纸',pad,38);c.fillStyle='#77736c';c.font='14px -apple-system, PingFang SC, sans-serif';c.fillText(`画板 ${pattern.w}×${pattern.h} 钉位  ·  实际摆豆 ${fmtNum(pattern.total)}颗  ·  ${pattern.used.length}色  ·  MARD 221 / 2.6mm`,pad,64); }
+    c.save();c.translate(pad+outer,pad+header+outer);
+
+    // Board/grid first: each line is a peg coordinate; intersections are bead centers.
+    c.lineWidth=Math.max(.45,cell*.035);c.strokeStyle='rgba(0,0,0,.18)';c.beginPath();
+    for(let x=0;x<pattern.w;x++){const px=x*cell;c.moveTo(px,0);c.lineTo(px,gridH)}
+    for(let y=0;y<pattern.h;y++){const py=y*cell;c.moveTo(0,py);c.lineTo(gridW,py)}c.stroke();
+
+    // Stronger reference lines every 13 positions; 52/78/104 all divide cleanly by 13.
+    c.lineWidth=Math.max(.8,cell*.075);c.strokeStyle='rgba(0,0,0,.32)';c.beginPath();
+    for(let x=0;x<pattern.w;x+=13){const px=x*cell;c.moveTo(px,0);c.lineTo(px,gridH)}
+    for(let y=0;y<pattern.h;y+=13){const py=y*cell;c.moveTo(0,py);c.lineTo(gridW,py)}c.stroke();
+
+    const radius=Math.max(1.6,cell*.42);
+    const fontSize=Math.max(6,Math.min(11,cell*.36));
     for(let y=0;y<pattern.h;y++)for(let x=0;x<pattern.w;x++){
-      const idx=pattern.cells[y*pattern.w+x],px=x*cell,py=y*cell;
-      c.fillStyle='#fff';c.fillRect(px,py,cell,cell);
+      const idx=pattern.cells[y*pattern.w+x];
       if(idx===BLANK) continue;
-      const p=palette[idx];
+      const p=palette[idx],px=x*cell,py=y*cell;
+      c.beginPath();c.arc(px,py,radius,0,Math.PI*2);
       if(renderMode==='code'){
-        c.fillStyle='#242424';
-      }else if(renderMode==='color'){
-        c.fillStyle=p.hex;c.fillRect(px,py,cell,cell);
+        c.fillStyle='#fff';c.fill();c.lineWidth=Math.max(.65,cell*.055);c.strokeStyle='rgba(0,0,0,.42)';c.stroke();c.fillStyle='#202020';
       }else{
-        c.fillStyle=p.hex;c.beginPath();c.arc(px+cell/2,py+cell/2,cell*.42,0,Math.PI*2);c.fill();c.fillStyle=textColor(p.rgb);
+        c.fillStyle=p.hex;c.fill();c.lineWidth=Math.max(.35,cell*.028);c.strokeStyle='rgba(0,0,0,.16)';c.stroke();c.fillStyle=textColor(p.rgb);
       }
       if((renderMode==='mixed'||renderMode==='code') && cell>=17){
-        c.font=`700 ${fontSize}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(p.code,px+cell/2,py+cell/2+.2);
+        c.font=`700 ${fontSize}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(p.code,px,py+.2);
       }
     }
-    c.lineWidth=.5;c.strokeStyle='rgba(0,0,0,.18)';c.beginPath();
-    for(let x=0;x<=pattern.w;x++){c.moveTo(x*cell,0);c.lineTo(x*cell,pattern.h*cell)}
-    for(let y=0;y<=pattern.h;y++){c.moveTo(0,y*cell);c.lineTo(pattern.w*cell,y*cell)}c.stroke();
-    c.lineWidth=1.35;c.strokeStyle='rgba(0,0,0,.42)';c.beginPath();
-    for(let x=0;x<=pattern.w;x+=10){c.moveTo(x*cell,0);c.lineTo(x*cell,pattern.h*cell)}
-    for(let y=0;y<=pattern.h;y+=10){c.moveTo(0,y*cell);c.lineTo(pattern.w*cell,y*cell)}c.stroke();
     c.restore();
   }
   function fitPattern(){
     if(!pattern)return;
     const available=Math.max(220,els.canvasWrap.clientWidth-30);
-    const cell=Math.max(3,Math.min(23,Math.floor(available/pattern.w)));
-    els.cellSize.value=cell; els.zoomVal.textContent=`${cell} px/格`;
+    const cell=Math.max(3,Math.min(23,Math.floor((available-6)/pattern.w)));
+    els.cellSize.value=cell; els.zoomVal.textContent=`${cell} px/钉距`;
     renderPattern(); requestAnimationFrame(()=>{els.canvasWrap.scrollLeft=Math.max(0,(els.canvas.scrollWidth-els.canvasWrap.clientWidth)/2);els.canvasWrap.scrollTop=Math.max(0,(els.canvas.scrollHeight-els.canvasWrap.clientHeight)/2);});
   }
   function renderPattern(){ if(!pattern)return;renderInto(els.canvas,+els.cellSize.value,mode,false); }
