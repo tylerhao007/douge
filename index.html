@@ -8,106 +8,82 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="豆格" />
   <title>豆格 · 拼豆图纸生成器</title>
+
   <style>
-    :root{--bg:#f5f3ee;--card:#fffefa;--ink:#191919;--muted:#77736c;--line:#ddd9d1;--accent:#181818;--soft:#ebe7df;--shadow:0 18px 48px rgba(40,35,28,.08)}
+    :root{--bg:#f4f4f1;--surface:#fff;--surface2:#f8f8f6;--ink:#111211;--muted:#777a75;--line:#e7e7e2;--line2:#d8d9d3;--accent:#171817;--accent2:#2b2c2a;--shadow:0 1px 2px rgba(0,0,0,.025),0 14px 44px rgba(20,22,18,.055);--r:22px}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue",Arial,sans-serif}
-    body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-    button,input,select{font:inherit}
-    .shell{max-width:1120px;margin:0 auto;padding:18px 16px 48px}
-    .topbar{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 18px}
-    .brand{display:flex;align-items:center;gap:10px}.brandmark{width:34px;height:34px;border-radius:11px;background:#161616;color:white;display:grid;place-items:center;font-weight:800;letter-spacing:-1px}.brandtext{font-weight:760;font-size:20px;letter-spacing:-.6px}.tag{font-size:12px;color:var(--muted);background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.06);padding:7px 10px;border-radius:999px}
-    .hero{padding:24px 4px 20px}.hero h1{font-size:clamp(34px,8vw,64px);line-height:.98;letter-spacing:-2.5px;margin:0 0 14px;max-width:820px}.hero p{margin:0;color:var(--muted);font-size:16px;line-height:1.65;max-width:680px}
-    .workspace{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;align-items:start;min-width:0}
-    .card{background:rgba(255,254,250,.9);border:1px solid rgba(20,20,20,.07);border-radius:24px;box-shadow:var(--shadow)}
-    .panel{padding:18px;position:sticky;top:14px}.sectionTitle{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 12px}.upload{position:relative;border:1.5px dashed #c9c4ba;border-radius:18px;padding:22px;text-align:center;background:#faf8f3;overflow:hidden}.upload input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.upload strong{display:block;font-size:16px;margin-bottom:5px}.upload span{font-size:12px;color:var(--muted)}
-    .thumb{display:none;margin-top:12px;border-radius:16px;overflow:hidden;background:#eee;aspect-ratio:4/3}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .control{margin-top:18px}.select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;color:var(--ink);outline:none}.useNote{margin-top:9px;background:#f1eee7;border-radius:13px;padding:10px 11px;font-size:11px;color:var(--muted);line-height:1.55}.controlRow{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}.control label{font-size:14px;font-weight:650}.value{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}.hint{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45}.range{width:100%;accent-color:#151515}.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#eeeae3;border-radius:14px;padding:4px}.seg.three{grid-template-columns:repeat(3,1fr)}.seg button{border:0;background:transparent;border-radius:10px;padding:9px 4px;font-size:12px;color:#625f59}.seg button.active{background:white;color:#151515;box-shadow:0 2px 8px rgba(0,0,0,.07);font-weight:700}.primary{width:100%;border:0;background:#171717;color:white;border-radius:16px;padding:14px 16px;font-weight:720;margin-top:20px;cursor:pointer}.primary:disabled{opacity:.35}.secondary{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;font-weight:650;cursor:pointer}.privacy{display:flex;gap:8px;align-items:flex-start;background:#f1eee7;border-radius:14px;padding:12px;margin-top:14px;color:#666057;font-size:11px;line-height:1.5}.privacy b{color:#292722}
-    .result{min-height:520px;padding:16px;min-width:0;overflow:hidden}.empty{display:grid;place-items:center;min-height:490px;text-align:center;color:var(--muted);padding:40px}.emptyIcon{width:72px;height:72px;border-radius:22px;background:#ede9e1;display:grid;place-items:center;margin:0 auto 16px;font-size:28px}.empty strong{display:block;color:#2a2926;font-size:18px;margin-bottom:8px}
-    .resultHead{display:none;justify-content:space-between;gap:10px;align-items:center;padding:3px 3px 14px}.resultHead h2{margin:0;font-size:22px;letter-spacing:-.5px}.sub{font-size:12px;color:var(--muted);margin-top:4px}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .stats{display:none;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}.stat{background:#f1eee7;border-radius:16px;padding:13px}.stat b{display:block;font-size:18px;letter-spacing:-.4px}.stat span{font-size:11px;color:var(--muted)}
-    .canvasWrap{display:none;background:#e8e4dc;border-radius:18px;overflow:auto;width:100%;max-width:100%;max-height:66vh;border:1px solid rgba(0,0,0,.06);touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.canvasPad{padding:14px;width:max-content;min-width:0}.canvasPad canvas{display:block;background:white;box-shadow:0 8px 30px rgba(0,0,0,.08);border-radius:3px;max-width:none}
-    .detailControls{display:none;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 2px;padding:0 3px;flex-wrap:wrap}.zoom{display:flex;align-items:center;gap:8px;min-width:220px;flex:1}.zoom input{width:min(210px,50vw)}.miniBtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap}
-    .lower{display:none;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.infoCard{background:#f7f4ee;border-radius:18px;padding:15px}.infoCard h3{font-size:14px;margin:0 0 11px}.timeBig{font-size:28px;font-weight:780;letter-spacing:-1px;margin-bottom:4px}.timeBreakdown{font-size:12px;color:var(--muted);line-height:1.7}
-    .paletteList{max-height:320px;overflow:auto}.palRow{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px}.palRow:last-child{border:0}.sw{width:24px;height:24px;border-radius:8px;border:1px solid rgba(0,0,0,.12)}.palRow b{font-variant-numeric:tabular-nums}.palRow span{color:var(--muted)}
-    .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#171717;color:white;border-radius:999px;padding:10px 14px;font-size:12px;opacity:0;pointer-events:none;transition:.22s;z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
-    @media(max-width:820px){.shell{padding:10px 12px 34px}.topbar{margin-top:2px}.tag{display:none}.hero{padding:20px 2px 16px}.hero h1{font-size:43px;line-height:1.03;letter-spacing:-1.8px}.workspace{grid-template-columns:1fr}.panel{position:static}.result{min-height:420px}.empty{min-height:390px}.stats{grid-template-columns:repeat(2,1fr)}.lower{grid-template-columns:1fr}.resultHead{align-items:flex-start}.actions{justify-content:flex-start}.canvasWrap{max-height:58vh}.card{border-radius:22px}}
-    @media print{body{background:white}.topbar,.hero,.panel,.actions,.detailControls,.lower,.stats{display:none!important}.shell{max-width:none;padding:0}.workspace{display:block}.card.result{border:0;box-shadow:none;padding:0}.resultHead{display:block!important}.canvasWrap{display:block!important;max-height:none;overflow:visible;border:0;background:white}.canvasPad{padding:0}.canvasPad canvas{max-width:100%!important;height:auto!important;box-shadow:none}.sub{margin-bottom:12px}}
+    body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,input,select{font:inherit}button{color:inherit}
+    .shell{max-width:1180px;margin:0 auto;padding:0 18px 56px}.topbar{height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;background:rgba(244,244,241,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.035)}
+    .brand{display:flex;align-items:center;gap:10px}.brandmark{width:30px;height:30px;border-radius:9px;background:#151615;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800}.brandtext{font-size:17px;font-weight:720;letter-spacing:-.35px}.topmeta{display:flex;gap:8px;align-items:center}.pill{font-size:11px;color:#696b67;border:1px solid var(--line);background:rgba(255,255,255,.7);padding:6px 9px;border-radius:999px}
+    .intro{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:30px 2px 18px}.intro h1{margin:0;font-size:30px;letter-spacing:-1px;font-weight:760}.intro p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.6}.privacyMini{font-size:11px;color:#747773;display:flex;gap:6px;align-items:center;white-space:nowrap}
+    .workspace{display:grid;grid-template-columns:352px minmax(0,1fr);gap:14px;align-items:start;min-width:0}.surface{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+    .panel{overflow:hidden;position:sticky;top:76px}.panelHead{padding:17px 18px 13px;border-bottom:1px solid var(--line)}.eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#969891;font-weight:700}.panelHead strong{display:block;margin-top:4px;font-size:17px;letter-spacing:-.35px}.panelBody{padding:0 17px 18px}
+    .upload{position:relative;margin-top:16px;border:1px solid var(--line2);border-radius:16px;padding:18px;background:linear-gradient(180deg,#fbfbfa,#f7f7f5);overflow:hidden;transition:.18s}.upload:active{transform:scale(.995)}.upload input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.uploadInner{display:flex;align-items:center;gap:12px}.uploadIcon{width:40px;height:40px;border-radius:12px;background:#1a1b1a;color:#fff;display:grid;place-items:center;font-size:20px}.upload strong{display:block;font-size:14px}.upload span{display:block;font-size:11px;color:var(--muted);margin-top:3px}.thumb{display:none;margin-top:10px;border-radius:14px;overflow:hidden;background:#eee;aspect-ratio:16/10}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .group{padding:17px 0 0}.group+.group{margin-top:15px;border-top:1px solid var(--line)}.groupTitle{font-size:11px;color:#8b8e88;font-weight:700;margin-bottom:13px}.control{margin-top:14px}.control:first-child{margin-top:0}.controlRow{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}.control label{font-size:13px;font-weight:620}.value{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.hint{font-size:10.5px;color:#8a8d87;margin-top:6px;line-height:1.45}.select{width:100%;border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:11px 12px;color:var(--ink);outline:none}.useNote{margin-top:8px;background:#f6f6f3;border-radius:12px;padding:10px 11px;font-size:10.5px;color:#777a75;line-height:1.55}.range{width:100%;accent-color:#171817}.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:#f0f0ed;border:1px solid #ebebe7;border-radius:12px;padding:3px}.seg.three{grid-template-columns:repeat(3,1fr)}.seg.two{grid-template-columns:repeat(2,1fr)}.seg button{border:0;background:transparent;border-radius:9px;padding:8px 3px;font-size:11px;color:#70736e;cursor:pointer}.seg button.active{background:#fff;color:#111;font-weight:680;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .switchRow{display:flex;justify-content:space-between;align-items:center;gap:12px}.switchText b{display:block;font-size:13px}.switchText span{display:block;font-size:10px;color:var(--muted);margin-top:2px}.switch{position:relative;width:43px;height:25px;flex:0 0 auto}.switch input{display:none}.switch i{position:absolute;inset:0;border-radius:999px;background:#d9dbd6;transition:.18s}.switch i:after{content:"";position:absolute;width:21px;height:21px;left:2px;top:2px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:.18s}.switch input:checked+i{background:#1b1c1b}.switch input:checked+i:after{transform:translateX(18px)}
+    .primary{width:100%;border:0;background:#171817;color:white;border-radius:13px;padding:13px 16px;font-weight:680;margin-top:18px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.09)}.primary:disabled{opacity:.35;box-shadow:none}
+    .result{min-height:630px;padding:14px;min-width:0;overflow:hidden}.empty{display:grid;place-items:center;min-height:590px;text-align:center;color:var(--muted);padding:40px}.emptyGlyph{width:64px;height:64px;border-radius:19px;border:1px solid var(--line);background:#fafaf8;display:grid;place-items:center;margin:0 auto 14px;font-size:25px}.empty strong{display:block;color:#292a28;font-size:16px;margin-bottom:6px}.empty span{font-size:12px}
+    .resultHead{display:none;justify-content:space-between;gap:12px;align-items:center;padding:3px 3px 12px}.resultHead h2{margin:0;font-size:19px;letter-spacing:-.45px}.sub{font-size:10.5px;color:var(--muted);margin-top:4px}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.secondary,.miniBtn{border:1px solid var(--line);background:#fafaf8;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:620;cursor:pointer}.secondary.dark{background:#181918;color:white;border-color:#181918}
+    .stats{display:none;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:15px;overflow:hidden;margin-bottom:10px}.stat{padding:11px 12px;background:#fbfbf9;border-right:1px solid var(--line)}.stat:last-child{border-right:0}.stat b{display:block;font-size:16px;letter-spacing:-.35px}.stat span{font-size:10px;color:var(--muted)}
+    .editorBar{display:none;align-items:center;gap:6px;padding:8px;border:1px solid var(--line);background:#fafaf8;border-radius:14px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch}.toolBtn{border:0;background:transparent;border-radius:9px;padding:8px 10px;font-size:11px;white-space:nowrap;color:#666965;cursor:pointer}.toolBtn.active{background:#1b1c1b;color:#fff}.toolBtn:disabled{opacity:.35}.editColor{border:1px solid var(--line);background:white;border-radius:9px;padding:7px 9px;font-size:11px;max-width:96px}.barSep{width:1px;height:22px;background:var(--line);flex:0 0 1px}
+    .canvasStage{display:none;background:#eeefec;border:1px solid #e3e4df;border-radius:18px;overflow:hidden}.canvasWrap{overflow:auto;width:100%;max-width:100%;max-height:66vh;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.canvasWrap.editing{touch-action:none}.canvasPad{padding:18px;width:max-content;min-width:100%;display:flex;justify-content:center;align-items:flex-start}.canvasPad canvas{display:block;background:white;box-shadow:0 12px 35px rgba(28,30,26,.08);border-radius:6px;max-width:none}
+    .detailControls{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px 0;flex-wrap:wrap}.zoom{display:flex;align-items:center;gap:8px;min-width:220px;flex:1}.zoom input{width:min(190px,42vw)}.zoneNav{display:none;align-items:center;gap:6px}.zoneNav span{font-size:10px;color:var(--muted);min-width:62px;text-align:center}
+    .lower{display:none;grid-template-columns:.9fr 1.1fr;gap:10px;margin-top:10px}.infoCard{border:1px solid var(--line);background:#fbfbf9;border-radius:15px;padding:14px}.infoCard h3{font-size:11px;color:#81847e;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em}.timeBig{font-size:26px;font-weight:740;letter-spacing:-.8px;margin-bottom:4px}.timeBreakdown{font-size:11px;color:var(--muted);line-height:1.65}.paletteList{max-height:280px;overflow:auto}.palRow{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:11px;cursor:pointer}.palRow:last-child{border:0}.sw{width:22px;height:22px;border-radius:7px;border:1px solid rgba(0,0,0,.12)}.palRow b{font-variant-numeric:tabular-nums}.palRow span{color:var(--muted)}
+    .finishNote{display:none;margin-top:10px;border:1px solid var(--line);background:#fbfbf9;border-radius:15px;padding:12px 13px}.finishNote b{font-size:12px}.finishNote p{margin:5px 0 0;font-size:10.5px;color:var(--muted);line-height:1.55}
+    .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#171817;color:white;border-radius:999px;padding:9px 13px;font-size:11px;opacity:0;pointer-events:none;transition:.22s;z-index:30}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:820px){.shell{padding:0 10px 34px}.topbar{height:54px}.topmeta .pill:first-child{display:none}.intro{padding:20px 2px 14px;align-items:flex-start}.intro h1{font-size:25px}.intro p{font-size:11.5px}.privacyMini{display:none}.workspace{grid-template-columns:1fr}.panel{position:static}.result{min-height:470px}.empty{min-height:440px}.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}.lower{grid-template-columns:1fr}.resultHead{align-items:flex-start}.actions{justify-content:flex-start}.canvasWrap{max-height:61vh}.surface{border-radius:19px}.editorBar{margin-left:-2px;margin-right:-2px}.panelHead{padding:15px 16px 12px}.panelBody{padding:0 15px 16px}}
+    @media print{body{background:white}.topbar,.intro,.panel,.actions,.detailControls,.lower,.stats,.editorBar,.finishNote{display:none!important}.shell{max-width:none;padding:0}.workspace{display:block}.result{border:0;box-shadow:none;padding:0}.resultHead{display:block!important}.canvasStage{display:block!important;border:0;background:white}.canvasWrap{max-height:none;overflow:visible}.canvasPad{padding:0}.canvasPad canvas{max-width:100%!important;height:auto!important;box-shadow:none}.sub{margin-bottom:12px}}
   </style>
 </head>
 <body>
   <main class="shell">
-    <header class="topbar"><div class="brand"><div class="brandmark">豆</div><div class="brandtext">豆格</div></div><div class="tag">MARD 221 · 2.6mm</div></header>
-    <section class="hero"><h1>把照片，变成真正能拼的图纸。</h1><p>导入图片后，本机完成像素化与 MARD 221 色匹配。按成品用途自动给出尺寸建议，图案居中放在方形画布中，并统计每个色号所需豆数与预计拼豆时间。</p></section>
+    <header class="topbar"><div class="brand"><div class="brandmark">豆</div><div class="brandtext">豆格</div></div><div class="topmeta"><span class="pill">MARD 221</span><span class="pill">2.6mm mini</span></div></header>
+    <section class="intro"><div><h1>新建拼豆图纸</h1><p>按用途、画板和细节自动生成；照片仅在本机处理。</p></div><div class="privacyMini">● 本机处理 · 不上传照片</div></section>
     <section class="workspace">
-      <aside class="card panel">
-        <div class="sectionTitle">01 · 图片</div>
-        <div class="upload"><input id="file" type="file" accept="image/*" /><strong>选择照片</strong><span>从 iPhone 相册导入 · 不上传服务器</span></div>
-        <div class="thumb" id="thumb"><img id="thumbImg" alt="预览"></div>
+      <aside class="surface panel">
+        <div class="panelHead"><span class="eyebrow">SETUP</span><strong>作品设置</strong></div>
+        <div class="panelBody">
+          <div class="upload"><input id="file" type="file" accept="image/*" /><div class="uploadInner"><div class="uploadIcon">＋</div><div><strong>选择照片</strong><span>从 iPhone 相册或文件导入</span></div></div></div>
+          <div class="thumb" id="thumb"><img id="thumbImg" alt="预览"></div>
 
-        <div class="control">
-          <div class="controlRow"><label>压制后用途</label><div class="value">自动给尺寸建议</div></div>
-          <select class="select" id="useCase">
-            <option value="bag">书包挂件</option>
-            <option value="key">钥匙扣 / 手机挂件</option>
-            <option value="magnet">冰箱贴</option>
-            <option value="coaster">杯垫</option>
-            <option value="desk">桌面摆件</option>
-            <option value="wall">相框 / 墙面装饰</option>
-            <option value="custom">自定义</option>
-          </select>
-          <div class="useNote" id="useNote"></div>
+          <div class="group"><div class="groupTitle">成品</div>
+            <div class="control"><div class="controlRow"><label>压制后用途</label><div class="value">自动建议</div></div>
+              <select class="select" id="useCase"><option value="bag">书包挂件</option><option value="key">钥匙扣 / 手机挂件</option><option value="magnet">冰箱贴</option><option value="coaster">杯垫</option><option value="desk">桌面摆件</option><option value="wall">相框 / 墙面装饰</option><option value="custom">自定义</option></select><div class="useNote" id="useNote"></div></div>
+            <div class="control"><div class="controlRow"><label>成品结构</label><div class="value">压制方式</div></div><div class="seg two" id="finishSeg"><button data-finish="outline" class="active">轮廓作品</button><button data-finish="full">满底作品</button></div><div class="hint">轮廓作品自动去背景；杯垫等可选满底。</div></div>
+            <div class="control switchRow"><div class="switchText"><b>用途附件提示</b><span>挂环、磁片或底座位置仅作辅助标记</span></div><label class="switch"><input id="guideToggle" type="checkbox" checked><i></i></label></div>
+          </div>
+
+          <div class="group"><div class="groupTitle">尺寸与画板</div>
+            <div class="control"><div class="controlRow"><label>画板规格</label><div class="value"><span id="boardVal">52</span> × <span id="boardVal2">52</span> 钉位</div></div><input class="range" id="board" type="range" min="52" max="104" step="26" value="52" /><div class="hint" id="boardHint"></div></div>
+            <div class="control"><div class="controlRow"><label>图案最大边</label><div class="value"><span id="motifVal">36</span> 颗</div></div><input class="range" id="motif" type="range" min="18" max="44" step="2" value="36" /><div class="hint" id="motifHint"></div></div>
+          </div>
+
+          <div class="group"><div class="groupTitle">图像处理</div>
+            <div class="control"><div class="controlRow"><label>素材类型</label><div class="value">优化映射</div></div><select class="select" id="sourceType"><option value="auto">自动 / 通用</option><option value="person">人物照片</option><option value="anime">动漫 / 插画</option><option value="pet">宠物</option></select></div>
+            <div class="control"><div class="controlRow"><label>细节方案</label><div class="value" id="detailText">标准 · 64色</div></div><div class="seg three" id="detailSeg"><button data-detail="lite">省豆</button><button data-detail="normal" class="active">标准</button><button data-detail="fine">高细节</button></div></div>
+            <div class="control"><div class="controlRow"><label>背景 / 留白</label><div class="value">空格不计豆数</div></div><div class="seg three" id="bgSeg"><button data-bg="auto" class="active">自动留白</button><button data-bg="keep">保留背景</button><button data-bg="alpha">仅透明</button></div><div class="controlRow" style="margin-top:9px"><label style="font-size:11px;color:var(--muted)">识别强度</label><div class="value"><span id="bgTolVal">18</span></div></div><input class="range" id="bgTol" type="range" min="6" max="36" step="1" value="18" /></div>
+            <div class="control"><div class="controlRow"><label>最多使用颜色</label><div class="value"><span id="colorVal">64</span> 色</div></div><input class="range" id="colors" type="range" min="12" max="221" step="1" value="64" /></div>
+          </div>
+
+          <div class="group"><div class="groupTitle">图纸</div>
+            <div class="control"><div class="controlRow"><label>显示方式</label><div class="value">颜色 + 色号</div></div><div class="seg" id="modeSeg"><button data-mode="mixed" class="active">混合</button><button data-mode="color">颜色</button><button data-mode="code">色号</button><button data-mode="dot">圆点</button></div></div>
+            <div class="control switchRow"><div class="switchText"><b>压制后正面镜像</b><span>含文字图案建议按成品展示面确认</span></div><label class="switch"><input id="mirrorToggle" type="checkbox"><i></i></label></div>
+            <div class="control"><div class="controlRow"><label>我的速度</label><div class="value"><span id="speedVal">18</span> 颗/分钟</div></div><input class="range" id="speed" type="range" min="8" max="32" step="1" value="18" /></div>
+          </div>
+          <button class="primary" id="generate" disabled>生成图纸</button>
         </div>
-
-        <div class="control">
-          <div class="controlRow"><label>画板规格</label><div class="value"><span id="boardVal">52</span> × <span id="boardVal2">52</span> 钉位</div></div>
-          <input class="range" id="board" type="range" min="52" max="104" step="26" value="52" />
-          <div class="hint" id="boardHint">52×52 表示 52列 × 52行可放豆钉位；豆子位于横竖线交点。</div>
-        </div>
-
-        <div class="control">
-          <div class="controlRow"><label>图案最大边</label><div class="value"><span id="motifVal">36</span> 颗</div></div>
-          <input class="range" id="motif" type="range" min="18" max="44" step="2" value="36" />
-          <div class="hint" id="motifHint">约 9.4cm；四周会自动保留安全钉位，不会顶格。</div>
-        </div>
-
-        <div class="control">
-          <div class="controlRow"><label>背景 / 留白</label><div class="value">不摆豆</div></div>
-          <div class="seg three" id="bgSeg"><button data-bg="auto" class="active">自动留白</button><button data-bg="keep">保留背景</button><button data-bg="alpha">仅透明</button></div>
-          <div class="controlRow" style="margin-top:10px"><label style="font-size:12px;color:var(--muted)">留白识别强度</label><div class="value"><span id="bgTolVal">18</span></div></div>
-          <input class="range" id="bgTol" type="range" min="6" max="36" step="1" value="18" />
-          <div class="hint">“自动留白”只从图片边缘识别相近背景，适合透明 PNG、白底/纯色底图片；留白格不会计入豆数。</div>
-        </div>
-
-        <div class="control">
-          <div class="controlRow"><label>最多使用颜色</label><div class="value"><span id="colorVal">64</span> 色</div></div>
-          <input class="range" id="colors" type="range" min="12" max="221" step="1" value="64" />
-          <div class="hint">颜色越少越好拼；颜色越多越接近原图。</div>
-        </div>
-
-        <div class="control">
-          <div class="controlRow"><label>图纸显示</label><div class="value">国内常用</div></div>
-          <div class="seg" id="modeSeg"><button data-mode="mixed" class="active">混合</button><button data-mode="color">颜色</button><button data-mode="code">色号</button><button data-mode="dot">圆点</button></div>
-        </div>
-
-        <div class="control">
-          <div class="controlRow"><label>我的速度</label><div class="value"><span id="speedVal">18</span> 颗/分钟</div></div>
-          <input class="range" id="speed" type="range" min="8" max="32" step="1" value="18" />
-          <div class="hint">用于估算拼豆时间；以后可按你的真实速度调整。</div>
-        </div>
-
-        <button class="primary" id="generate" disabled>生成拼豆图纸</button>
-        <div class="privacy"><span>🔒</span><div><b>照片留在你的设备里。</b><br>所有图片处理都在浏览器本地执行，不会发送到服务器。</div></div>
       </aside>
 
-      <section class="card result">
-        <div class="empty" id="empty"><div><div class="emptyIcon">✣</div><strong>还没有图纸</strong><span>先从左侧导入一张图片，再调整尺寸和色数。</span></div></div>
-        <div class="resultHead" id="resultHead"><div><h2>拼豆图纸</h2><div class="sub" id="resultSub"></div></div><div class="actions"><button class="secondary" id="exportBtn">导出 PNG</button><button class="secondary" onclick="window.print()">打印 / PDF</button></div></div>
-        <div class="stats" id="stats"><div class="stat"><b id="statBeads">—</b><span>总豆数</span></div><div class="stat"><b id="statColors">—</b><span>使用色数</span></div><div class="stat"><b id="statSize">—</b><span>预计成品</span></div><div class="stat"><b id="statTime">—</b><span>预计时间</span></div></div>
-        <div class="canvasWrap" id="canvasWrap"><div class="canvasPad"><canvas id="pattern"></canvas></div></div>
-        <div class="detailControls" id="detailControls"><div class="zoom"><button class="miniBtn" id="fitBtn">适应屏幕</button><span class="value">细节</span><input id="cellSize" class="range" type="range" min="3" max="38" value="10" step="1"></div><div class="value" id="zoomVal">12 px/钉距</div></div>
-        <div class="lower" id="lower"><div class="infoCard"><h3>预计拼豆时间</h3><div class="timeBig" id="timeBig">—</div><div class="timeBreakdown" id="timeBreakdown"></div></div><div class="infoCard"><h3>色号用量</h3><div class="paletteList" id="paletteList"></div></div></div>
+      <section class="surface result">
+        <div class="empty" id="empty"><div><div class="emptyGlyph">✣</div><strong>图纸会显示在这里</strong><span>导入图片并生成后，可继续手动修豆、改单色和进入制作模式。</span></div></div>
+        <div class="resultHead" id="resultHead"><div><h2>拼豆图纸</h2><div class="sub" id="resultSub"></div></div><div class="actions"><button class="secondary" id="exportBtn">保存图纸</button><button class="secondary" onclick="window.print()">PDF / 打印</button></div></div>
+        <div class="stats" id="stats"><div class="stat"><b id="statBeads">—</b><span>实际摆豆</span></div><div class="stat"><b id="statColors">—</b><span>使用色数</span></div><div class="stat"><b id="statSize">—</b><span>成品尺寸</span></div><div class="stat"><b id="statTime">—</b><span>预计用时</span></div></div>
+        <div class="editorBar" id="editorBar"><button class="toolBtn active" data-tool="view">浏览</button><button class="toolBtn" data-tool="erase">擦除</button><button class="toolBtn" data-tool="paint">补豆 / 改色</button><button class="toolBtn" data-tool="fill">区域填充</button><select class="editColor" id="editColor"></select><span class="barSep"></span><button class="toolBtn" id="undoBtn" disabled>撤销</button><button class="toolBtn" id="productionBtn">制作模式</button></div>
+        <div class="canvasStage" id="canvasStage"><div class="canvasWrap" id="canvasWrap"><div class="canvasPad"><canvas id="pattern"></canvas></div></div></div>
+        <div class="detailControls" id="detailControls"><div class="zoom"><button class="miniBtn" id="fitBtn">适应屏幕</button><span class="value">细节</span><input id="cellSize" class="range" type="range" min="3" max="38" value="10" step="1"></div><div class="zoneNav" id="zoneNav"><button class="miniBtn" id="zonePrev">‹</button><span id="zoneLabel">区域 1 / 16</span><button class="miniBtn" id="zoneNext">›</button></div><div class="value" id="zoomVal">10 px/钉距</div></div>
+        <div class="finishNote" id="finishNote"><b id="finishTitle">成品提示</b><p id="finishText"></p></div>
+        <div class="lower" id="lower"><div class="infoCard"><h3>预计拼豆时间</h3><div class="timeBig" id="timeBig">—</div><div class="timeBreakdown" id="timeBreakdown"></div></div><div class="infoCard"><h3>色号用量 · 点选可设为编辑色</h3><div class="paletteList" id="paletteList"></div></div></div>
       </section>
     </section>
   </main>
@@ -121,11 +97,11 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   'use strict';
   const $ = s => document.querySelector(s);
   const els = {
-    file: $('#file'), thumb: $('#thumb'), thumbImg: $('#thumbImg'), useCase: $('#useCase'), useNote: $('#useNote'),
+    file: $('#file'), thumb: $('#thumb'), thumbImg: $('#thumbImg'), useCase: $('#useCase'), useNote: $('#useNote'), finishSeg: $('#finishSeg'), guideToggle: $('#guideToggle'), sourceType: $('#sourceType'), detailSeg: $('#detailSeg'), detailText: $('#detailText'), mirrorToggle: $('#mirrorToggle'),
     board: $('#board'), boardVal: $('#boardVal'), boardVal2: $('#boardVal2'), boardHint: $('#boardHint'), motif: $('#motif'), motifVal: $('#motifVal'), motifHint: $('#motifHint'),
     bgSeg: $('#bgSeg'), bgTol: $('#bgTol'), bgTolVal: $('#bgTolVal'),
     colors: $('#colors'), colorVal: $('#colorVal'), speed: $('#speed'), speedVal: $('#speedVal'), generate: $('#generate'),
-    modeSeg: $('#modeSeg'), empty: $('#empty'), resultHead: $('#resultHead'), resultSub: $('#resultSub'), stats: $('#stats'), canvasWrap: $('#canvasWrap'),
+    modeSeg: $('#modeSeg'), empty: $('#empty'), resultHead: $('#resultHead'), resultSub: $('#resultSub'), stats: $('#stats'), canvasStage: $('#canvasStage'), canvasWrap: $('#canvasWrap'), editorBar: $('#editorBar'), editColor: $('#editColor'), undoBtn: $('#undoBtn'), productionBtn: $('#productionBtn'), zoneNav: $('#zoneNav'), zoneLabel: $('#zoneLabel'), zonePrev: $('#zonePrev'), zoneNext: $('#zoneNext'), finishNote: $('#finishNote'), finishTitle: $('#finishTitle'), finishText: $('#finishText'),
     canvas: $('#pattern'), detailControls: $('#detailControls'), lower: $('#lower'), cellSize: $('#cellSize'), zoomVal: $('#zoomVal'), fitBtn: $('#fitBtn'),
     statBeads: $('#statBeads'), statColors: $('#statColors'), statSize: $('#statSize'), statTime: $('#statTime'),
     timeBig: $('#timeBig'), timeBreakdown: $('#timeBreakdown'), paletteList: $('#paletteList'), exportBtn: $('#exportBtn'), toast: $('#toast')
@@ -136,17 +112,19 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   let pattern = null;
   let mode = 'mixed';
   let bgMode = 'auto';
+  let finishMode='outline', detailPreset='normal', mirrorView=false, editTool='view', productionMode=false, activeZone=0, editColorIdx=0, renderMeta=null, pointerDown=false, strokeSnap=false;
+  const undoStack=[];
   const beadMM = 2.6;
   const BLANK = 65535;
   const BOARD_SIZES = [52,78,104];
   const normalizeBoard = v => BOARD_SIZES.reduce((best,n)=>Math.abs(n-v)<Math.abs(best-v)?n:best,BOARD_SIZES[0]);
   const USE_PRESETS = {
-    bag:{board:52,motif:36,label:'书包挂件',note:'推荐图案最大边约 9.4cm。52×52 画板上四周约预留 8 个钉位，方便压制、修边，也给挂环位置留余量。'},
-    key:{board:52,motif:24,label:'钥匙扣 / 手机挂件',note:'推荐图案最大边约 6.2cm。使用 52×52 画板居中制作，成品更轻，顶部建议预留挂环位置。'},
-    magnet:{board:52,motif:38,label:'冰箱贴',note:'推荐图案最大边约 9.9cm。使用 52×52 画板，主体居中，背面保留足够面积贴磁片。'},
-    coaster:{board:52,motif:40,label:'杯垫',note:'推荐图案最大边约 10.4cm。使用 52×52 画板，适合方形或圆形满底作品，并预留压制边距。'},
-    desk:{board:52,motif:44,label:'桌面摆件',note:'推荐图案最大边约 11.4cm。使用 52×52 画板，细节更充分，适合配底座或支架。'},
-    wall:{board:78,motif:68,label:'相框 / 墙面装饰',note:'推荐使用 78×78 画板，图案最大边约 17.7cm；需要更大作品时可手动切换 104×104。'},
+    bag:{board:52,motif:36,label:'书包挂件',finish:'outline',note:'推荐最大边约 9.4cm。主体居中并留出压制安全边，顶部可显示挂环位置提示。',finishTip:'书包挂件：建议压制后在顶部中心附近安装挂环；图案四周保留空钉位，修边更从容。'},
+    key:{board:52,motif:24,label:'钥匙扣 / 手机挂件',finish:'outline',note:'推荐最大边约 6.2cm。成品更轻，顶部预留挂环区域。',finishTip:'钥匙扣 / 手机挂件：建议小尺寸、少色并保留顶部挂环位置，避免成品过重。'},
+    magnet:{board:52,motif:38,label:'冰箱贴',finish:'outline',note:'推荐最大边约 9.9cm。主体居中，背面保留平整区域贴磁片。',finishTip:'冰箱贴：背面中部建议保留相对平整的连续区域，方便粘贴磁片。'},
+    coaster:{board:52,motif:40,label:'杯垫',finish:'full',note:'推荐最大边约 10.4cm。更适合满底结构，压制后受力更均匀。',finishTip:'杯垫：推荐满底作品，并尽量使用接近方形或圆形的素材；压制要均匀，避免翘曲。'},
+    desk:{board:52,motif:44,label:'桌面摆件',finish:'outline',note:'推荐最大边约 11.4cm。细节更充分，底部可显示支架 / 插槽提示。',finishTip:'桌面摆件：底部建议预留较平直区域，便于卡入底座或粘接支架。'},
+    wall:{board:78,motif:68,label:'相框 / 墙面装饰',finish:'outline',note:'推荐 78×78 画板、最大边约 17.7cm；复杂作品可切换 104×104。',finishTip:'相框 / 墙面装饰：优先保证细节和轮廓完整，较大作品建议分区域制作。'},
     custom:{board:52,motif:36,label:'自定义',note:'画板可选 52×52、78×78、104×104；系统保持图案居中，并让每颗豆落在横竖线交点。'}
   };
 
@@ -180,8 +158,9 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   function applyUseCase(key, persist=true){
     const p=USE_PRESETS[key]||USE_PRESETS.custom;
     els.useCase.value=key;
-    if(key!=='custom'){ els.board.value=p.board; els.motif.value=p.motif; }
-    els.useNote.textContent=p.note;
+    if(key!=='custom'){ els.board.value=p.board; els.motif.value=p.motif; if(p.finish) finishMode=p.finish; }
+    [...els.finishSeg.querySelectorAll('button')].forEach(x=>x.classList.toggle('active',x.dataset.finish===finishMode));
+    els.useNote.textContent=p.note;if(finishMode==='full')bgMode='keep';[...els.bgSeg.querySelectorAll('button')].forEach(x=>x.classList.toggle('active',x.dataset.bg===bgMode));
     updateControls(null,persist);
   }
 
@@ -197,7 +176,8 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     els.boardHint.textContent=`${b}×${b} 钉位 · 2.6mm mini · 约 ${fmtCM(b*beadMM)} × ${fmtCM(b*beadMM)}；豆子中心位于横竖线交点`;
     els.motifHint.textContent=`最大边约 ${fmtCM(m*beadMM)}；至少预留约 ${minMargin} 个钉位，图案自动居中`;
     els.zoomVal.textContent=`${els.cellSize.value} px/钉距`;
-    if(persist) localStorage.setItem('douge-settings',JSON.stringify({board:b,motif:m,c,s,bt,cell:+els.cellSize.value,mode,bgMode,use:els.useCase.value}));
+    els.detailText.textContent=detailPreset==='lite'?'省豆 · 32色':detailPreset==='fine'?'高细节 · 96色':'标准 · 64色';
+    if(persist) localStorage.setItem('douge-settings',JSON.stringify({board:b,motif:m,c,s,bt,cell:+els.cellSize.value,mode,bgMode,use:els.useCase.value,finishMode,detailPreset,mirrorView,sourceType:els.sourceType.value,guide:els.guideToggle.checked}));
     if(pattern){ updateTime(); if(evt && evt.target===els.cellSize) renderPattern(); }
   }
   try{
@@ -206,11 +186,14 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     els.useCase.value=use;
     if(s.board) els.board.value=normalizeBoard(+s.board); else if(USE_PRESETS[use]) els.board.value=USE_PRESETS[use].board;
     if(s.motif) els.motif.value=s.motif; else if(USE_PRESETS[use]) els.motif.value=USE_PRESETS[use].motif;
-    if(s.c) els.colors.value=s.c;if(s.s) els.speed.value=s.s;if(s.bt) els.bgTol.value=s.bt;if(s.cell) els.cellSize.value=s.cell;if(s.mode) mode=s.mode;if(s.bgMode) bgMode=s.bgMode;
+    if(s.c) els.colors.value=s.c;if(s.s) els.speed.value=s.s;if(s.bt) els.bgTol.value=s.bt;if(s.cell) els.cellSize.value=s.cell;if(s.mode) mode=s.mode;if(s.bgMode) bgMode=s.bgMode;if(s.finishMode)finishMode=s.finishMode;if(s.detailPreset)detailPreset=s.detailPreset;if(typeof s.mirrorView==='boolean')mirrorView=s.mirrorView;if(s.sourceType)els.sourceType.value=s.sourceType;if(typeof s.guide==='boolean')els.guideToggle.checked=s.guide;
     els.useNote.textContent=(USE_PRESETS[use]||USE_PRESETS.custom).note;
   }catch{ applyUseCase('bag',false); }
   [...els.modeSeg.querySelectorAll('button')].forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
   [...els.bgSeg.querySelectorAll('button')].forEach(b=>b.classList.toggle('active',b.dataset.bg===bgMode));
+  [...els.finishSeg.querySelectorAll('button')].forEach(b=>b.classList.toggle('active',b.dataset.finish===finishMode));
+  [...els.detailSeg.querySelectorAll('button')].forEach(b=>b.classList.toggle('active',b.dataset.detail===detailPreset));
+  els.mirrorToggle.checked=mirrorView;
   updateControls(null,false);
   els.useCase.addEventListener('change',()=>applyUseCase(els.useCase.value));
   ['input','change'].forEach(ev=>{
@@ -231,6 +214,11 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     updateControls();
   });
 
+  els.finishSeg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;finishMode=b.dataset.finish;[...els.finishSeg.querySelectorAll('button')].forEach(x=>x.classList.toggle('active',x===b));if(finishMode==='full'){bgMode='keep';[...els.bgSeg.querySelectorAll('button')].forEach(x=>x.classList.toggle('active',x.dataset.bg==='keep'));}updateControls();});
+  els.detailSeg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;detailPreset=b.dataset.detail;[...els.detailSeg.querySelectorAll('button')].forEach(x=>x.classList.toggle('active',x===b));els.colors.value=detailPreset==='lite'?32:detailPreset==='fine'?96:64;updateControls();});
+  els.mirrorToggle.addEventListener('change',()=>{mirrorView=els.mirrorToggle.checked;updateControls();if(pattern)renderPattern();});
+  els.sourceType.addEventListener('change',updateControls);els.guideToggle.addEventListener('change',()=>{updateControls();if(pattern)renderPattern();});
+
   els.file.addEventListener('change', async e=>{
     const file=e.target.files?.[0]; if(!file)return;
     if(sourceURL) URL.revokeObjectURL(sourceURL);
@@ -241,20 +229,20 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   });
 
   function resetResult(){
-    els.empty.style.display='grid';els.resultHead.style.display='none';els.stats.style.display='none';els.canvasWrap.style.display='none';els.detailControls.style.display='none';els.lower.style.display='none';
+    els.empty.style.display='grid';els.resultHead.style.display='none';els.stats.style.display='none';els.canvasStage.style.display='none';els.editorBar.style.display='none';els.detailControls.style.display='none';els.lower.style.display='none';els.finishNote.style.display='none';
   }
 
   els.generate.addEventListener('click',()=>{
     if(!sourceImage)return;
     const old=els.generate.innerHTML; els.generate.disabled=true;els.generate.innerHTML='<span class="spinner"></span>正在生成';
     setTimeout(()=>{
-      try{ pattern=generatePattern(sourceImage,+els.board.value,+els.motif.value,+els.colors.value,bgMode,+els.bgTol.value); showResult(); toast('图纸生成完成'); }
+      try{ pattern=generatePattern(sourceImage,+els.board.value,+els.motif.value,+els.colors.value,finishMode==='full'?'keep':bgMode,+els.bgTol.value,els.sourceType.value); showResult(); toast('图纸生成完成'); }
       catch(err){ console.error(err);toast('生成失败，请换一张图片重试'); }
       finally{ els.generate.disabled=false;els.generate.innerHTML=old; }
     },40);
   });
 
-  function generatePattern(img,boardSide,motifMax,maxColors,backgroundMode='auto',bgTol=18){
+  function generatePattern(img,boardSide,motifMax,maxColors,backgroundMode='auto',bgTol=18,sourceType='auto'){
     boardSide=normalizeBoard(Math.round(boardSide));
     motifMax=Math.min(Math.max(8,Math.round(motifMax)),boardSide-4);
     const ratio=img.naturalWidth/img.naturalHeight;
@@ -268,7 +256,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     const data=ctx.getImageData(0,0,targetW,targetH).data;
     const n=targetW*targetH;
     const labs=new Array(n), alpha=new Uint8Array(n), blank=new Uint8Array(n);
-    for(let i=0,p=0;i<data.length;i+=4,p++){ labs[p]=rgbToLab(data[i],data[i+1],data[i+2]); alpha[p]=data[i+3]; if(data[i+3]<48) blank[p]=1; }
+    for(let i=0,p=0;i<data.length;i+=4,p++){ let r=data[i],g=data[i+1],b=data[i+2]; const avg=(r+g+b)/3; if(sourceType==='anime'){r=Math.max(0,Math.min(255,(r-128)*1.12+128+(r-avg)*.08));g=Math.max(0,Math.min(255,(g-128)*1.12+128+(g-avg)*.08));b=Math.max(0,Math.min(255,(b-128)*1.12+128+(b-avg)*.08));}else if(sourceType==='person'){r=Math.max(0,Math.min(255,(r-128)*1.03+130-(r-avg)*.03));g=Math.max(0,Math.min(255,(g-128)*1.03+130-(g-avg)*.03));b=Math.max(0,Math.min(255,(b-128)*1.03+130-(b-avg)*.03));}else if(sourceType==='pet'){r=Math.max(0,Math.min(255,(r-128)*1.08+128));g=Math.max(0,Math.min(255,(g-128)*1.08+128));b=Math.max(0,Math.min(255,(b-128)*1.08+128));} labs[p]=rgbToLab(r,g,b); alpha[p]=data[i+3]; if(data[i+3]<48) blank[p]=1; }
 
     if(backgroundMode==='auto'){
       const corners=[0,targetW-1,(targetH-1)*targetW,targetH*targetW-1].map(i=>labs[i]);
@@ -303,7 +291,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
       const idx=maxColors===221?first[p]:nearestIndex(labs[p],allowed);motifCells[p]=idx;finalCounts[idx]++;total++;
       const x=p%targetW,y=(p/targetW)|0; if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
     }
-    if(total===0 && backgroundMode==='auto') return generatePattern(img,boardSide,motifMax,maxColors,'keep',bgTol);
+    if(total===0 && backgroundMode==='auto') return generatePattern(img,boardSide,motifMax,maxColors,'keep',bgTol,sourceType);
 
     const cropW=maxX-minX+1,cropH=maxY-minY+1;
     const offsetX=Math.floor((boardSide-cropW)/2), offsetY=Math.floor((boardSide-cropH)/2);
@@ -326,13 +314,15 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   }
 
   function showResult(){
-    els.empty.style.display='none';els.resultHead.style.display='flex';els.stats.style.display='grid';els.canvasWrap.style.display='block';els.detailControls.style.display='flex';els.lower.style.display='grid';
+    els.empty.style.display='none';els.resultHead.style.display='flex';els.stats.style.display='grid';els.canvasStage.style.display='block';els.editorBar.style.display='flex';els.detailControls.style.display='flex';els.lower.style.display='grid';els.finishNote.style.display='block';
     const cmW=pattern.bbox.w*beadMM/10,cmH=pattern.bbox.h*beadMM/10;
     const margins={l:pattern.bbox.x,r:pattern.w-pattern.bbox.x-pattern.bbox.w,t:pattern.bbox.y,b:pattern.h-pattern.bbox.y-pattern.bbox.h};
     const minMargin=Math.min(margins.l,margins.r,margins.t,margins.b);
     const useLabel=(USE_PRESETS[pattern.useCase]||USE_PRESETS.custom).label;
     els.resultSub.textContent=`${useLabel} · 画板 ${pattern.w} × ${pattern.h} 钉位 · 图案 ${pattern.bbox.w} × ${pattern.bbox.h} · 最小边距 ${minMargin} 个钉位`;
     els.statBeads.textContent=fmtNum(pattern.total);els.statColors.textContent=pattern.used.length;els.statSize.textContent=`${cmW.toFixed(1)} × ${cmH.toFixed(1)}cm`;
+    const pp=USE_PRESETS[pattern.useCase]||USE_PRESETS.custom;els.finishTitle.textContent=`${pp.label} · 成品提示`;els.finishText.textContent=pp.finishTip||pp.note;
+    activeZone=0;updateZoneUI();
     requestAnimationFrame(()=>{ fitPattern(); renderPalette(); updateTime(); });
   }
 
@@ -349,7 +339,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';
     const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
     if(forExport){ c.fillStyle='#171717';c.font='700 26px -apple-system, PingFang SC, sans-serif';c.fillText('豆格 · 拼豆图纸',pad,38);c.fillStyle='#77736c';c.font='14px -apple-system, PingFang SC, sans-serif';c.fillText(`画板 ${pattern.w}×${pattern.h} 钉位  ·  实际摆豆 ${fmtNum(pattern.total)}颗  ·  ${pattern.used.length}色  ·  MARD 221 / 2.6mm`,pad,64); }
-    c.save();c.translate(pad+outer,pad+header+outer);
+    c.save();c.translate(pad+outer,pad+header+outer); if(!forExport)renderMeta={cell,outer,pad,header,gridW,gridH};
 
     // Board/grid first: each line is a peg coordinate; intersections are bead centers.
     c.lineWidth=Math.max(.45,cell*.035);c.strokeStyle='rgba(0,0,0,.18)';c.beginPath();
@@ -366,7 +356,7 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     for(let y=0;y<pattern.h;y++)for(let x=0;x<pattern.w;x++){
       const idx=pattern.cells[y*pattern.w+x];
       if(idx===BLANK) continue;
-      const p=palette[idx],px=x*cell,py=y*cell;
+      const p=palette[idx],dx=mirrorView?(pattern.w-1-x):x,px=dx*cell,py=y*cell;
       c.beginPath();c.arc(px,py,radius,0,Math.PI*2);
       if(renderMode==='code'){
         c.fillStyle='#fff';c.fill();c.lineWidth=Math.max(.65,cell*.055);c.strokeStyle='rgba(0,0,0,.42)';c.stroke();c.fillStyle='#202020';
@@ -376,6 +366,20 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
       if((renderMode==='mixed'||renderMode==='code') && cell>=17){
         c.font=`700 ${fontSize}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(p.code,px,py+.2);
       }
+    }
+    if(els.guideToggle.checked){
+      const uc=pattern.useCase, cx=gridW/2;
+      c.save();c.strokeStyle='rgba(20,20,20,.55)';c.fillStyle='rgba(20,20,20,.7)';c.lineWidth=Math.max(1,cell*.08);c.setLineDash([Math.max(3,cell*.24),Math.max(3,cell*.18)]);
+      if(uc==='bag'||uc==='key'){const yy=Math.max(0,(pattern.bbox.y-2)*cell);c.beginPath();c.arc(cx,yy,Math.max(4,cell*.52),0,Math.PI*2);c.stroke();}
+      else if(uc==='magnet'){const bx=(mirrorView?(pattern.w-pattern.bbox.x-pattern.bbox.w):pattern.bbox.x)*cell, by=pattern.bbox.y*cell;c.strokeRect(bx+pattern.bbox.w*cell*.27,by+pattern.bbox.h*cell*.27,pattern.bbox.w*cell*.46,pattern.bbox.h*cell*.46);}
+      else if(uc==='desk'){const yy=(pattern.bbox.y+pattern.bbox.h-1)*cell;c.beginPath();c.moveTo(cx-cell*2,yy+cell*.75);c.lineTo(cx+cell*2,yy+cell*.75);c.stroke();}
+      c.restore();
+    }
+    if(productionMode){
+      const zonesPer=Math.ceil(pattern.w/13),zx=activeZone%zonesPer,zy=Math.floor(activeZone/zonesPer),x0=zx*13*cell,y0=zy*13*cell,x1=Math.min(pattern.w-1,zx*13+12)*cell,y1=Math.min(pattern.h-1,zy*13+12)*cell;
+      c.save();c.fillStyle='rgba(246,246,243,.72)';c.beginPath();c.rect(0,0,gridW,gridH);c.rect(x0,y0,Math.max(cell,x1-x0),Math.max(cell,y1-y0));c.fill('evenodd');c.setLineDash([]);c.strokeStyle='rgba(20,20,20,.8)';c.lineWidth=Math.max(1.2,cell*.11);c.strokeRect(x0,y0,Math.max(cell,x1-x0),Math.max(cell,y1-y0));
+      if(cell>=7){c.fillStyle='#242524';c.font=`600 ${Math.max(7,cell*.42)}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='bottom';for(let x=0;x<pattern.w;x+=13){const dx=mirrorView?(pattern.w-1-x):x;c.fillText(String(x+1),dx*cell,-cell*.55)}c.textAlign='right';c.textBaseline='middle';for(let y=0;y<pattern.h;y+=13)c.fillText(String(y+1),-cell*.55,y*cell);}
+      c.restore();
     }
     c.restore();
   }
@@ -390,8 +394,31 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
   els.fitBtn.addEventListener('click',fitPattern);
 
   function renderPalette(){
-    els.paletteList.innerHTML=pattern.used.map(({idx,count})=>{const p=palette[idx];return `<div class="palRow"><i class="sw" style="background:${p.hex}"></i><div><b>${p.code}</b><br><span>${p.hex}</span></div><b>${fmtNum(count)} 颗</b></div>`}).join('');
+    els.paletteList.innerHTML=pattern.used.map(({idx,count})=>{const p=palette[idx];return `<div class="palRow" data-idx="${idx}"><i class="sw" style="background:${p.hex}"></i><div><b>${p.code}</b><br><span>${p.hex}</span></div><b>${fmtNum(count)} 颗</b></div>`}).join('');
+    els.editColor.innerHTML=palette.map((p,i)=>`<option value="${i}">${p.code}</option>`).join('');els.editColor.value=String(editColorIdx);
   }
+
+  function recalcPattern(){
+    const counts=new Uint32Array(221);let total=0,minX=pattern.w,minY=pattern.h,maxX=-1,maxY=-1,transitions=0,possible=0;
+    for(let y=0;y<pattern.h;y++)for(let x=0;x<pattern.w;x++){const i=y*pattern.w+x,a=pattern.cells[i];if(a===BLANK)continue;counts[a]++;total++;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;if(x+1<pattern.w&&pattern.cells[i+1]!==BLANK){possible++;if(a!==pattern.cells[i+1])transitions++;}if(y+1<pattern.h&&pattern.cells[i+pattern.w]!==BLANK){possible++;if(a!==pattern.cells[i+pattern.w])transitions++;}}
+    pattern.total=total;pattern.used=[];for(let i=0;i<221;i++)if(counts[i])pattern.used.push({idx:i,count:counts[i]});pattern.used.sort((a,b)=>b.count-a.count);pattern.bbox=total?{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1}:{x:0,y:0,w:0,h:0};pattern.transitionRatio=possible?transitions/possible:0;
+    const cmW=pattern.bbox.w*beadMM/10,cmH=pattern.bbox.h*beadMM/10;els.statBeads.textContent=fmtNum(pattern.total);els.statColors.textContent=pattern.used.length;els.statSize.textContent=`${cmW.toFixed(1)} × ${cmH.toFixed(1)}cm`;renderPattern();renderPalette();updateTime();
+  }
+  function pushUndo(){undoStack.push(pattern.cells.slice());if(undoStack.length>20)undoStack.shift();els.undoBtn.disabled=false;}
+  function setTool(t){editTool=t;[...els.editorBar.querySelectorAll('[data-tool]')].forEach(b=>b.classList.toggle('active',b.dataset.tool===t));els.canvasWrap.classList.toggle('editing',t!=='view');}
+  els.editorBar.addEventListener('click',e=>{const b=e.target.closest('[data-tool]');if(b)setTool(b.dataset.tool);});
+  els.editColor.addEventListener('change',()=>{editColorIdx=+els.editColor.value;});
+  els.paletteList.addEventListener('click',e=>{const row=e.target.closest('.palRow');if(!row)return;editColorIdx=+row.dataset.idx;els.editColor.value=String(editColorIdx);setTool('paint');toast(`编辑色：${palette[editColorIdx].code}`);});
+  els.undoBtn.addEventListener('click',()=>{if(!undoStack.length)return;pattern.cells=undoStack.pop();els.undoBtn.disabled=!undoStack.length;recalcPattern();});
+  function canvasCellFromEvent(e){if(!pattern||!renderMeta)return null;const rect=els.canvas.getBoundingClientRect(),sx=parseFloat(els.canvas.style.width)/rect.width,sy=parseFloat(els.canvas.style.height)/rect.height;const cx=(e.clientX-rect.left)*sx-renderMeta.outer,cy=(e.clientY-rect.top)*sy-renderMeta.outer;let dx=Math.round(cx/renderMeta.cell),y=Math.round(cy/renderMeta.cell);if(dx<0||dx>=pattern.w||y<0||y>=pattern.h)return null;const x=mirrorView?(pattern.w-1-dx):dx;return {x,y,i:y*pattern.w+x};}
+  function floodFill(start,newVal){const old=pattern.cells[start];if(old===newVal)return;const q=[start],seen=new Uint8Array(pattern.cells.length);seen[start]=1;while(q.length){const i=q.pop();if(pattern.cells[i]!==old)continue;pattern.cells[i]=newVal;const x=i%pattern.w,y=(i/pattern.w)|0;const ns=[];if(x>0)ns.push(i-1);if(x+1<pattern.w)ns.push(i+1);if(y>0)ns.push(i-pattern.w);if(y+1<pattern.h)ns.push(i+pattern.w);for(const n of ns)if(!seen[n]&&pattern.cells[n]===old){seen[n]=1;q.push(n)}}}
+  function editAt(e){if(editTool==='view'||!pattern)return;const p=canvasCellFromEvent(e);if(!p)return;if(!strokeSnap){pushUndo();strokeSnap=true;}if(editTool==='erase')pattern.cells[p.i]=BLANK;else if(editTool==='paint')pattern.cells[p.i]=editColorIdx;else if(editTool==='fill'){floodFill(p.i,editColorIdx);pointerDown=false;}renderPattern();}
+  els.canvas.addEventListener('pointerdown',e=>{if(editTool==='view')return;pointerDown=true;strokeSnap=false;els.canvas.setPointerCapture?.(e.pointerId);editAt(e);e.preventDefault();});
+  els.canvas.addEventListener('pointermove',e=>{if(pointerDown&&(editTool==='erase'||editTool==='paint')){editAt(e);e.preventDefault();}});
+  const endStroke=()=>{if(pointerDown||strokeSnap){pointerDown=false;if(strokeSnap){strokeSnap=false;recalcPattern();}}};els.canvas.addEventListener('pointerup',endStroke);els.canvas.addEventListener('pointercancel',endStroke);
+  function updateZoneUI(){if(!pattern)return;const n=Math.ceil(pattern.w/13)**2;activeZone=Math.max(0,Math.min(n-1,activeZone));els.zoneLabel.textContent=`区域 ${activeZone+1} / ${n}`;els.zoneNav.style.display=productionMode?'flex':'none';}
+  els.productionBtn.addEventListener('click',()=>{productionMode=!productionMode;els.productionBtn.classList.toggle('active',productionMode);els.productionBtn.textContent=productionMode?'退出制作':'制作模式';activeZone=0;updateZoneUI();renderPattern();});
+  els.zonePrev.addEventListener('click',()=>{activeZone--;updateZoneUI();renderPattern();});els.zoneNext.addEventListener('click',()=>{activeZone++;updateZoneUI();renderPattern();});
 
   function estimate(){
     const speed=+els.speed.value, placement=pattern.total/speed;
@@ -405,15 +432,148 @@ const MARD_PALETTE = [{"code":"A1","hex":"#FAF4C8"},{"code":"A2","hex":"#FFFFD5"
     els.timeBreakdown.innerHTML=`摆豆约 ${fmtTime(t.placement)}<br>找色 / 换色约 ${fmtTime(t.setup+t.complexity)}<br>检查与补豆约 ${fmtTime(t.check)}<br>按你的速度 ${els.speed.value} 颗/分钟估算`;
   }
 
-  els.exportBtn.addEventListener('click',()=>{
-    if(!pattern)return; const out=document.createElement('canvas'); const cell=Math.max(12,Math.min(38,Math.floor(5200/pattern.w),Math.floor(14500/(pattern.h+4))));
-    renderInto(out,cell,mode,true);
-    out.toBlob(blob=>{ if(!blob)return;const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`豆格_${(USE_PRESETS[pattern.useCase]||USE_PRESETS.custom).label}_${pattern.w}x${pattern.h}_${pattern.total}颗.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000); },'image/png');
+  function codeOrder(a,b){
+    const ma=palette[a.idx].code.match(/^([A-Z]+)(\d+)$/), mb=palette[b.idx].code.match(/^([A-Z]+)(\d+)$/);
+    if(!ma||!mb) return palette[a.idx].code.localeCompare(palette[b.idx].code);
+    return ma[1]===mb[1] ? (+ma[2])-(+mb[2]) : ma[1].localeCompare(mb[1]);
+  }
+
+  function roundRectPath(c,x,y,w,h,r){
+    r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();
+  }
+
+  function renderExportSheet(canvas){
+    if(!pattern)return;
+    // Keep the saved sheet readable on phone while avoiding giant iOS canvases.
+    const maxBoardPx=pattern.w<=52?2100:pattern.w<=78?2450:2850;
+    const cell=Math.max(20,Math.min(42,Math.floor(maxBoardPx/Math.max(1,pattern.w-1))));
+    const gridW=(pattern.w-1)*cell, gridH=(pattern.h-1)*cell;
+    const pagePad=72, coordX=44, coordY=38, topInfo=196;
+    const boardX=pagePad+coordX, boardY=topInfo+coordY;
+    const sorted=[...pattern.used].sort(codeOrder);
+    const chipH=44, chipGap=10, chipMinW=175;
+    const contentW=gridW+coordX*2;
+    const cols=Math.max(4,Math.min(12,Math.floor((contentW+chipGap)/(chipMinW+chipGap))));
+    const chipW=(contentW-(cols-1)*chipGap)/cols;
+    const legendRows=Math.ceil(sorted.length/cols);
+    const legendTitleH=52, legendH=legendTitleH+legendRows*(chipH+chipGap);
+    const footerH=56;
+    const W=pagePad*2+contentW;
+    const H=boardY+gridH+coordY+52+legendH+footerH+pagePad;
+    canvas.width=Math.round(W);canvas.height=Math.round(H);canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const c=canvas.getContext('2d');
+    c.clearRect(0,0,W,H);c.fillStyle='#ffffff';c.fillRect(0,0,W,H);
+
+    const useLabel=(USE_PRESETS[pattern.useCase]||USE_PRESETS.custom).label;
+    const cmW=pattern.bbox.w*beadMM/10,cmH=pattern.bbox.h*beadMM/10;
+    const t=estimate();
+    c.fillStyle='#111';c.textAlign='left';c.textBaseline='alphabetic';
+    c.font='800 36px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif';
+    c.fillText(`${useLabel} · 拼豆图纸`,pagePad,58);
+    c.fillStyle='#70736e';c.font='500 16px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif';
+    c.fillText(`MARD 221 标准色卡 · 2.6mm mini${mirrorView?' · 正面镜像':''}`,pagePad,88);
+
+    // Small product mark, intentionally clean rather than a watermark.
+    c.textAlign='right';c.fillStyle='#111';c.font='800 18px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif';c.fillText('豆格',W-pagePad,56);
+    c.fillStyle='#90938d';c.font='500 12px -apple-system, BlinkMacSystemFont, PingFang SC, sans-serif';c.fillText('BEAD PATTERN',W-pagePad,78);
+
+    const metaY=116, metaH=56, metaGap=10;
+    const metas=[
+      ['画板',`${pattern.w} × ${pattern.h}`],['图案',`${pattern.bbox.w} × ${pattern.bbox.h}`],['实际摆豆',`${fmtNum(pattern.total)} 颗`],['使用颜色',`${pattern.used.length} 色`],['成品',`${cmW.toFixed(1)} × ${cmH.toFixed(1)}cm`],['预计用时',fmtTime(t.total)]
+    ];
+    const metaW=(W-pagePad*2-metaGap*(metas.length-1))/metas.length;
+    metas.forEach((m,i)=>{const x=pagePad+i*(metaW+metaGap);c.fillStyle='#f6f7f5';roundRectPath(c,x,metaY,metaW,metaH,12);c.fill();c.textAlign='left';c.fillStyle='#8a8d87';c.font='500 11px -apple-system, PingFang SC, sans-serif';c.fillText(m[0],x+13,metaY+19);c.fillStyle='#171817';c.font='700 15px -apple-system, PingFang SC, sans-serif';c.fillText(m[1],x+13,metaY+41);});
+
+    // Coordinate rails inspired by common domestic pattern sheets.
+    c.fillStyle='#eef5f8';c.fillRect(boardX,boardY-coordY,gridW,coordY);c.fillRect(boardX,boardY+gridH,gridW,coordY);
+    c.fillRect(boardX-coordX,boardY,coordX,gridH);c.fillRect(boardX+gridW,boardY,coordX,gridH);
+    c.strokeStyle='#aab8bf';c.lineWidth=1;c.strokeRect(boardX-coordX,boardY-coordY,gridW+coordX*2,gridH+coordY*2);
+
+    c.fillStyle='#30434c';c.font=`600 ${Math.max(8,Math.min(13,cell*.34))}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='middle';
+    for(let x=0;x<pattern.w;x++){
+      const px=boardX+x*cell;
+      c.fillText(String(x+1),px,boardY-coordY/2);
+      c.fillText(String(x+1),px,boardY+gridH+coordY/2);
+    }
+    c.textAlign='center';
+    for(let y=0;y<pattern.h;y++){
+      const py=boardY+y*cell;
+      c.fillText(String(y+1),boardX-coordX/2,py);
+      c.fillText(String(y+1),boardX+gridW+coordX/2,py);
+    }
+
+    // Main board: lines are peg coordinates; bead centers sit exactly on intersections.
+    c.fillStyle='#fff';c.fillRect(boardX,boardY,gridW,gridH);
+    c.lineWidth=Math.max(.55,cell*.035);c.strokeStyle='rgba(45,60,65,.18)';c.beginPath();
+    for(let x=0;x<pattern.w;x++){const px=boardX+x*cell;c.moveTo(px,boardY);c.lineTo(px,boardY+gridH)}
+    for(let y=0;y<pattern.h;y++){const py=boardY+y*cell;c.moveTo(boardX,py);c.lineTo(boardX+gridW,py)}c.stroke();
+    c.lineWidth=Math.max(1.1,cell*.07);c.strokeStyle='rgba(39,65,77,.36)';c.beginPath();
+    for(let x=0;x<pattern.w;x+=13){const px=boardX+x*cell;c.moveTo(px,boardY);c.lineTo(px,boardY+gridH)}
+    for(let y=0;y<pattern.h;y+=13){const py=boardY+y*cell;c.moveTo(boardX,py);c.lineTo(boardX+gridW,py)}c.stroke();
+
+    const radius=Math.max(3,cell*.43),fs=Math.max(7,Math.min(12,cell*.34));
+    for(let y=0;y<pattern.h;y++)for(let x=0;x<pattern.w;x++){
+      const idx=pattern.cells[y*pattern.w+x];if(idx===BLANK)continue;
+      const p=palette[idx],dx=mirrorView?(pattern.w-1-x):x,px=boardX+dx*cell,py=boardY+y*cell;
+      c.beginPath();c.arc(px,py,radius,0,Math.PI*2);c.fillStyle=p.hex;c.fill();c.lineWidth=Math.max(.45,cell*.025);c.strokeStyle='rgba(0,0,0,.18)';c.stroke();
+      c.fillStyle=textColor(p.rgb);c.font=`700 ${fs}px -apple-system, PingFang SC, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(p.code,px,py+.2);
+    }
+
+    // Optional practical accessory hints on the saved sheet too.
+    if(els.guideToggle.checked){
+      const uc=pattern.useCase,cx=boardX+gridW/2;c.save();c.strokeStyle='rgba(25,25,25,.48)';c.lineWidth=Math.max(1,cell*.07);c.setLineDash([Math.max(4,cell*.28),Math.max(3,cell*.2)]);
+      if(uc==='bag'||uc==='key'){const yy=boardY+Math.max(0,(pattern.bbox.y-2)*cell);c.beginPath();c.arc(cx,yy,Math.max(5,cell*.52),0,Math.PI*2);c.stroke();}
+      else if(uc==='magnet'){const bx=boardX+(mirrorView?(pattern.w-pattern.bbox.x-pattern.bbox.w):pattern.bbox.x)*cell,by=boardY+pattern.bbox.y*cell;c.strokeRect(bx+pattern.bbox.w*cell*.27,by+pattern.bbox.h*cell*.27,pattern.bbox.w*cell*.46,pattern.bbox.h*cell*.46);}
+      else if(uc==='desk'){const yy=boardY+(pattern.bbox.y+pattern.bbox.h-1)*cell;c.beginPath();c.moveTo(cx-cell*2,yy+cell*.75);c.lineTo(cx+cell*2,yy+cell*.75);c.stroke();}
+      c.restore();
+    }
+
+    // Legend: compact color chips with exact code + required count.
+    const legendY=boardY+gridH+coordY+52;
+    c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#171817';c.font='800 19px -apple-system, PingFang SC, sans-serif';c.fillText('用豆清单',pagePad,legendY+21);
+    c.fillStyle='#8a8d87';c.font='500 12px -apple-system, PingFang SC, sans-serif';c.fillText('色号按字母与数字排序 · 数量仅统计实际摆豆',pagePad+92,legendY+21);
+    const chipStartY=legendY+legendTitleH;
+    sorted.forEach((u,i)=>{
+      const col=i%cols,row=Math.floor(i/cols),x=pagePad+col*(chipW+chipGap),y=chipStartY+row*(chipH+chipGap),p=palette[u.idx];
+      c.fillStyle=p.hex;roundRectPath(c,x,y,chipW,chipH,9);c.fill();c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=1;c.stroke();
+      c.fillStyle=textColor(p.rgb);c.font='800 13px -apple-system, PingFang SC, sans-serif';c.textAlign='left';c.textBaseline='middle';c.fillText(p.code,x+12,y+chipH/2);
+      c.textAlign='right';c.font='700 12px -apple-system, PingFang SC, sans-serif';c.fillText(`${fmtNum(u.count)}颗`,x+chipW-12,y+chipH/2);
+    });
+
+    const footY=chipStartY+legendRows*(chipH+chipGap)+20;
+    c.fillStyle='#eeeeea';c.fillRect(pagePad,footY,W-pagePad*2,1);
+    c.fillStyle='#8a8d87';c.font='500 11px -apple-system, PingFang SC, sans-serif';c.textAlign='left';c.fillText('提示：实体豆颜色受批次、光线与屏幕显示影响，采购与制作以 MARD 色号为准。',pagePad,footY+30);
+    c.textAlign='right';c.fillText('豆格 · 本地生成',W-pagePad,footY+30);
+  }
+
+  els.exportBtn.addEventListener('click',async()=>{
+    if(!pattern)return;
+    const old=els.exportBtn.textContent;els.exportBtn.disabled=true;els.exportBtn.textContent='正在生成…';
+    try{
+      const out=document.createElement('canvas');renderExportSheet(out);
+      const blob=await new Promise(resolve=>out.toBlob(resolve,'image/png'));
+      if(!blob)throw new Error('export failed');
+      const filename=`豆格_${(USE_PRESETS[pattern.useCase]||USE_PRESETS.custom).label}_${pattern.w}x${pattern.h}_${pattern.total}颗.png`;
+      const file=new File([blob],filename,{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'豆格拼豆图纸'});}
+        catch(err){if(err && err.name!=='AbortError')throw err;}
+      }else{
+        const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);
+      }
+      toast('图纸已生成');
+    }catch(err){console.error(err);toast('保存失败，请重试');}
+    finally{els.exportBtn.disabled=false;els.exportBtn.textContent=old;}
   });
 
   window.addEventListener('resize',()=>{ if(pattern && window.innerWidth<820) fitPattern(); });
 
-  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  // v0.7 removes the old offline cache feature. Clean up any v0.6 worker/cache once.
+  if(/^https?:$/.test(location.protocol)){
+    if('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    if('caches' in window) caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('douge-')).map(k=>caches.delete(k)))).catch(()=>{});
+  }
+
 })();
 
 </script>
